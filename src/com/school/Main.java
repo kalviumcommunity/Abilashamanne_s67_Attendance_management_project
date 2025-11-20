@@ -4,91 +4,85 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
+
+    public static void displaySchoolDirectory(List<Person> people) {
+        System.out.println("===== School Directory =====\n");
+        for (Person person : people) {
+            person.displayDetails();   // runtime polymorphism in action
+        }
+    }
+
     public static void main(String[] args) {
 
         System.out.println("Welcome to the Attendance System!");
-        System.out.println("----- Part 6: Interface-Driven Persistence & Storage -----\n");
+        System.out.println("----- Part 7: Polymorphic Behaviour & Reports -----\n");
 
-        // ===== Students (using List) =====
+        // ===== Students =====
         List<Student> students = new ArrayList<>();
-        students.add(new Student("Alice", "Grade 10"));
-        students.add(new Student("Bob", "Grade 11"));
-        students.add(new Student("Charlie", "Grade 12"));
+        Student student1 = new Student("Alice", "Grade 10");
+        Student student2 = new Student("Bob", "Grade 11");
+        Student student3 = new Student("Charlie", "Grade 12");
+        students.add(student1);
+        students.add(student2);
+        students.add(student3);
 
         // ===== Teachers =====
         List<Teacher> teachers = new ArrayList<>();
-        teachers.add(new Teacher("Dr. Smith", "Mathematics"));
-        teachers.add(new Teacher("Ms. Johnson", "Computer Science"));
+        Teacher teacher1 = new Teacher("Dr. Smith", "Mathematics");
+        Teacher teacher2 = new Teacher("Ms. Johnson", "Computer Science");
+        teachers.add(teacher1);
+        teachers.add(teacher2);
 
         // ===== Staff =====
         List<Staff> staffMembers = new ArrayList<>();
-        staffMembers.add(new Staff("Mr. Brown", "Admin"));
-        staffMembers.add(new Staff("Mrs. Clark", "Librarian"));
+        Staff staff1 = new Staff("Mr. Brown", "Admin");
+        Staff staff2 = new Staff("Mrs. Clark", "Librarian");
+        staffMembers.add(staff1);
+        staffMembers.add(staff2);
 
-        // ===== Courses (also List) =====
+        // ===== Courses =====
         List<Course> courses = new ArrayList<>();
-        courses.add(new Course("Mathematics"));
-        courses.add(new Course("Computer Science"));
+        Course course1 = new Course("Mathematics");
+        Course course2 = new Course("Computer Science");
+        courses.add(course1);
+        courses.add(course2);
 
-        // ===== Display Person hierarchy =====
-        System.out.println("----- Person Hierarchy Details -----\n");
+        // ===== Polymorphic School Directory =====
+        List<Person> schoolPeople = new ArrayList<>();
+        schoolPeople.addAll(students);
+        schoolPeople.addAll(teachers);
+        schoolPeople.addAll(staffMembers);
 
-        System.out.println("Students:");
-        for (Student s : students) {
-            s.displayDetails();
-        }
+        displaySchoolDirectory(schoolPeople);
 
-        System.out.println("Teachers:");
-        for (Teacher t : teachers) {
-            t.displayDetails();
-        }
+        // ===== Attendance Records (now using Student & Course objects) =====
+        System.out.println("===== Attendance Log =====");
 
-        System.out.println("Staff Members:");
-        for (Staff st : staffMembers) {
-            st.displayDetails();
-        }
-
-        System.out.println("----- Course Details -----");
-        for (Course c : courses) {
-            c.displayDetails();
-        }
-
-        // ===== Attendance Records =====
-        System.out.println("----- Attendance Records -----");
         List<AttendanceRecord> attendanceLog = new ArrayList<>();
-
-        // Use getId() from Person and getCourseId() from Course
-        attendanceLog.add(new AttendanceRecord(
-                students.get(0).getId(),
-                courses.get(0).getCourseId(),
-                "Present"
-        ));
-        attendanceLog.add(new AttendanceRecord(
-                students.get(1).getId(),
-                courses.get(0).getCourseId(),
-                "Absent"
-        ));
-        attendanceLog.add(new AttendanceRecord(
-                students.get(2).getId(),
-                courses.get(1).getCourseId(),
-                "present"   // valid, lowercase
-        ));
-        attendanceLog.add(new AttendanceRecord(
-                students.get(0).getId(),
-                courses.get(1).getCourseId(),
-                "Late"      // invalid to trigger warning
-        ));
+        attendanceLog.add(new AttendanceRecord(student1, course1, "Present"));
+        attendanceLog.add(new AttendanceRecord(student2, course1, "Absent"));
+        attendanceLog.add(new AttendanceRecord(student3, course2, "present")); // valid
+        attendanceLog.add(new AttendanceRecord(student1, course2, "Late"));    // invalid, triggers warning
 
         for (AttendanceRecord record : attendanceLog) {
             record.displayRecord();
         }
 
-        // ===== Save to files using FileStorageService =====
+        // ===== Saving Data to Files via Storable & FileStorageService =====
         FileStorageService storageService = new FileStorageService();
-        storageService.saveData(students, "students.txt");
+
+        // Filter students from schoolPeople using instanceof (Person is NOT Storable)
+        List<Student> studentsForSaving = new ArrayList<>();
+        for (Person person : schoolPeople) {
+            if (person instanceof Student) {
+                studentsForSaving.add((Student) person);
+            }
+        }
+
+        storageService.saveData(studentsForSaving, "students.txt");
         storageService.saveData(courses, "courses.txt");
         storageService.saveData(attendanceLog, "attendance_log.txt");
 
-        System.out.println("\nCheck 'students.txt', 'courses.txt', and 'attendance_log.txt' in the project folder.");
+        System.out.println("\nCheck 'students.txt', 'courses.txt', and 'attendance_log.txt' for saved data.");
     }
 }
