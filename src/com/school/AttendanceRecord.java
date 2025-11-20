@@ -42,7 +42,6 @@ public class AttendanceRecord implements Storable {
 
     @Override
     public String toDataString() {
-        // Still use IDs for storage: studentId,courseId,status
         return student.getId() + "," + course.getCourseId() + "," + status;
     }
 }
