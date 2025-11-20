@@ -1,15 +1,24 @@
 package com.school;
 
 public class Student {
-    private static int nextStudentIdCounter = 1;  // auto ID generator
+    private static int nextStudentIdCounter = 1;  // auto ID
 
-    private int studentId;
-    private String name;
+    private int studentId;    // now encapsulated
+    private String name;      // now encapsulated
 
-    // Constructor to initialize student with auto ID
+    // Constructor
     public Student(String name) {
         this.studentId = nextStudentIdCounter++;
-        this.name = name;  // 'this' used to refer to instance variable
+        this.name = name;
+    }
+
+    // Getters (no setters needed for now)
+    public int getStudentId() {
+        return this.studentId;
+    }
+
+    public String getName() {
+        return this.name;
     }
 
     public void displayDetails() {
