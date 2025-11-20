@@ -1,6 +1,6 @@
 package com.school;
 
-public class AttendanceRecord {
+public class AttendanceRecord implements Storable {
     private int studentId;
     private int courseId;
     private String status;
@@ -11,7 +11,6 @@ public class AttendanceRecord {
 
         if (status != null &&
                 (status.equalsIgnoreCase("Present") || status.equalsIgnoreCase("Absent"))) {
-            // normalize: "Present" or "Absent"
             this.status = status.substring(0, 1).toUpperCase() + status.substring(1).toLowerCase();
         } else {
             System.out.println("Warning: Invalid attendance status '" + status
@@ -20,7 +19,6 @@ public class AttendanceRecord {
         }
     }
 
-    // Getters
     public int getStudentId() {
         return studentId;
     }
@@ -37,5 +35,11 @@ public class AttendanceRecord {
         System.out.println("Attendance Record -> Student ID: " + studentId
                 + ", Course ID: C" + courseId
                 + ", Status: " + status);
+    }
+
+    @Override
+    public String toDataString() {
+        // studentId,courseId,status
+        return studentId + "," + courseId + "," + status;
     }
 }
