@@ -122,3 +122,27 @@ It includes:
 2. Compile: `javac src/com/school/*.java`
 3. Run: `java -cp src com.school.Main`
 4. Check for `students.txt`, `teachers.txt`, `staff.txt`, `courses.txt`, and `attendance_log.txt`.
+
+
+## Part 10: Capacity Management & SOLID Principles Reflection
+- Added a `capacity` feature to the `Course` class, along with an internal list of `enrolledStudents`.
+- Updated `Course.displayDetails()` to show capacity and current enrollment count, and `Course.toDataString()` to save capacity to `courses.txt`.
+- Modified `RegistrationService` so that:
+    - `createCourse` now accepts a capacity parameter.
+    - `enrollStudentInCourse(Student student, Course course)` handles enrollment logic and prints feedback based on success/failure.
+- Updated `Main.java` to demonstrate:
+    - Course creation with capacity values.
+    - Enrollment attempts, including at least one that exceeds course capacity.
+    - Displaying updated course information with capacity and enrollment.
+    - Optionally checking if a student is enrolled in a course before marking attendance.
+- Reflected how SOLID principles were used across the project:
+    - **Single Responsibility Principle:** `RegistrationService` manages registration; `AttendanceService` manages attendance; `FileStorageService` handles persistence.
+    - **Dependency Inversion & Injection:** Services depend on abstractions (`Storable`, service classes) and receive dependencies (`FileStorageService`, `RegistrationService`) via constructors.
+    - **Open/Closed Principle:** New behaviors (capacity, enrollment, services) were added with minimal changes to existing code.
+    - **Interface Segregation & Liskov Substitution:** `Storable` is a focused interface; `Person` subclasses (`Student`, `Teacher`, `Staff`) can be used polymorphically where `Person` is expected.
+
+### How to Run
+1. Navigate to the project root directory.
+2. Compile: `javac src/com/school/*.java`
+3. Run: `java -cp src com.school.Main`
+4. Check `courses.txt` for the capacity field and other files for their respective data.

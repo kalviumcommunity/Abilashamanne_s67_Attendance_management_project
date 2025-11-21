@@ -40,8 +40,8 @@ public class RegistrationService {
         return staff;
     }
 
-    public Course createCourse(String courseName) {
-        Course course = new Course(courseName);
+    public Course createCourse(String courseName, int capacity) {
+        Course course = new Course(courseName, capacity);
         courses.add(course);
         return course;
     }
@@ -92,6 +92,19 @@ public class RegistrationService {
         people.addAll(teachers);
         people.addAll(staffMembers);
         return people;
+    }
+
+    // ---- Enrollment logic with capacity check ----
+
+    public boolean enrollStudentInCourse(Student student, Course course) {
+        boolean success = course.addStudent(student);
+        if (success) {
+            System.out.println("Enrolled " + student.getName() + " in " + course.getCourseName());
+        } else {
+            System.out.println("Could not enroll " + student.getName() + " in " + course.getCourseName()
+                    + " (course may be full or student already enrolled).");
+        }
+        return success;
     }
 
     // ---- Save all registrations ----
