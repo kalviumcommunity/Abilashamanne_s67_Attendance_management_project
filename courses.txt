@@ -1,2 +1,2 @@
-101,Mathematics
-102,Computer Science
+101,Mathematics,2
+102,Computer Science,1
