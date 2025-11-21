@@ -1,12 +1,12 @@
 package com.school;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
 
-    public static void displaySchoolDirectory(List<Person> people) {
+    public static void displaySchoolDirectory(RegistrationService registrationService) {
         System.out.println("===== School Directory =====\n");
+        List<Person> people = registrationService.getAllPeople();
         for (Person person : people) {
             person.displayDetails();   // runtime polymorphism
         }
@@ -15,73 +15,53 @@ public class Main {
     public static void main(String[] args) {
 
         System.out.println("Welcome to the Attendance System!");
-        System.out.println("----- Part 8: Overloaded Attendance Commands & Queries -----\n");
+        System.out.println("----- Part 9: SOLID Service Layer (Registration & Attendance Separation) -----\n");
 
-        // ===== Set up core data =====
-        List<Student> students = new ArrayList<>();
-        Student student1 = new Student("Alice", "Grade 10");
-        Student student2 = new Student("Bob", "Grade 11");
-        Student student3 = new Student("Charlie", "Grade 12");
-        students.add(student1);
-        students.add(student2);
-        students.add(student3);
-
-        List<Teacher> teachers = new ArrayList<>();
-        Teacher teacher1 = new Teacher("Dr. Smith", "Mathematics");
-        Teacher teacher2 = new Teacher("Ms. Johnson", "Computer Science");
-        teachers.add(teacher1);
-        teachers.add(teacher2);
-
-        List<Staff> staffMembers = new ArrayList<>();
-        Staff staff1 = new Staff("Mr. Brown", "Admin");
-        Staff staff2 = new Staff("Mrs. Clark", "Librarian");
-        staffMembers.add(staff1);
-        staffMembers.add(staff2);
-
-        List<Course> courses = new ArrayList<>();
-        Course course1 = new Course("Mathematics");
-        Course course2 = new Course("Computer Science");
-        courses.add(course1);
-        courses.add(course2);
-
-        // ===== School directory (polymorphism from Part 7) =====
-        List<Person> schoolPeople = new ArrayList<>();
-        schoolPeople.addAll(students);
-        schoolPeople.addAll(teachers);
-        schoolPeople.addAll(staffMembers);
-
-        displaySchoolDirectory(schoolPeople);
-
-        // ===== Setup storage + attendance service =====
+        // ---- Instantiate services ----
         FileStorageService storageService = new FileStorageService();
-        AttendanceService attendanceService = new AttendanceService(storageService);
+        RegistrationService registrationService = new RegistrationService(storageService);
+        AttendanceService attendanceService = new AttendanceService(storageService, registrationService);
 
-        // ===== Mark attendance using overloaded methods =====
-        System.out.println("===== Marking Attendance (Overloaded Methods) =====");
+        // ---- Register students, teachers, staff, courses via RegistrationService ----
+        Student student1 = registrationService.registerStudent("Alice", "Grade 10");
+        Student student2 = registrationService.registerStudent("Bob", "Grade 11");
+        Student student3 = registrationService.registerStudent("Charlie", "Grade 12");
 
-        // Using Student & Course directly
-        attendanceService.markAttendance(student1, course1, "Present");
-        attendanceService.markAttendance(student2, course1, "Absent");
-        attendanceService.markAttendance(student3, course2, "present"); // valid lowercase
+        Teacher teacher1 = registrationService.registerTeacher("Dr. Smith", "Mathematics");
+        Teacher teacher2 = registrationService.registerTeacher("Ms. Johnson", "Computer Science");
 
-        // Using IDs + lookup lists (markAttendance with int IDs)
-        attendanceService.markAttendance(student1.getId(), course2.getCourseId(),
-                "Late", students, courses); // invalid status -> should warn
+        Staff staff1 = registrationService.registerStaff("Mr. Brown", "Admin");
+        Staff staff2 = registrationService.registerStaff("Mrs. Clark", "Librarian");
+
+        Course course1 = registrationService.createCourse("Mathematics");
+        Course course2 = registrationService.createCourse("Computer Science");
+
+        // ---- Display school directory using RegistrationService ----
+        displaySchoolDirectory(registrationService);
+
+        // ---- Mark attendance using ID-based overloaded method ----
+        System.out.println("===== Marking Attendance (ID-based calls) =====");
+        attendanceService.markAttendance(student1.getId(), course1.getCourseId(), "Present");
+        attendanceService.markAttendance(student2.getId(), course1.getCourseId(), "Absent");
+        attendanceService.markAttendance(student3.getId(), course2.getCourseId(), "present");
+        attendanceService.markAttendance(student1.getId(), course2.getCourseId(), "Late"); // invalid -> warning
 
         System.out.println();
 
-        // ===== Display attendance in different ways =====
-        attendanceService.displayAttendanceLog();               // all records
-        attendanceService.displayAttendanceLog(student1);       // only Alice
-        attendanceService.displayAttendanceLog(course1);        // only Mathematics
+        // ---- Display attendance reports ----
+        attendanceService.displayAttendanceLog();         // all records
+        attendanceService.displayAttendanceLog(student1); // filtered by student
+        attendanceService.displayAttendanceLog(course1);  // filtered by course
 
-        // ===== Save attendance to file =====
+        // ---- Save all data ----
+        registrationService.saveAllRegistrations();
         attendanceService.saveAttendanceData();
 
-        // Also save students & courses like before
-        storageService.saveData(students, "students.txt");
-        storageService.saveData(courses, "courses.txt");
-
-        System.out.println("Check 'attendance_log.txt', 'students.txt', and 'courses.txt' for saved data.");
+        System.out.println("Data saved. Check:");
+        System.out.println("- students.txt");
+        System.out.println("- teachers.txt");
+        System.out.println("- staff.txt");
+        System.out.println("- courses.txt");
+        System.out.println("- attendance_log.txt");
     }
 }
